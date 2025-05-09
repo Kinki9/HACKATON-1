@@ -1,5 +1,6 @@
-import { Gauge, Truck, PackageCheck, AlertCircle } from 'lucide-react';
+import { Gauge, Truck, Clock, PackageCheck, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+
 
 const shipments = [
   {
