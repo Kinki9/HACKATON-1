@@ -1,37 +1,38 @@
-const AnalyticsPage = () => {
-  const [selectedChip, setSelectedChip] = useState(null);
-  const [timeRange, setTimeRange] = useState("lastWeek");
+// ProductsPage.jsx
+import { motion } from "framer-motion";
+import Header from "../components/common/Header";
+import StatCard from "../components/common/StatCard";
+import { Cpu, AlertTriangle, Activity, Truck } from "lucide-react";
+import ProductionTrendChart from "../components/products/ProductionTrendChart";
+import ProductsTable from "../components/products/ProductsTable";
+
+const ProductsPage = () => {
+  // Datos simulados (evitar undefined)
+  const stats = [
+    { name: "Chips Fabricados", value: 1243, icon: Cpu, color: "#6366F1" },
+    // ... otros datos
+  ];
 
   return (
-    <div className='flex-1 overflow-auto relative z-10 bg-gray-900'>
-      <Header 
-        title="Control de Calidad"  // Antes: "Centro de Control Aeroespacial"
-        subtitle="Monitoreo de parámetros críticos" 
-      />
-
+    <div className='flex-1 overflow-auto relative z-10'>
+      <Header title='Fabricación de Semiconductores' />
       <main className='max-w-7xl mx-auto py-6 px-4 lg:px-8'>
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold text-gray-100">Semiconductores Activos</h3> {/* Cambio de texto */}
-          <ExportControls timeRange={timeRange} setTimeRange={setTimeRange} /> {/* Mismo componente */}
-        </div>
+        {/* Stats */}
+        <motion.div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8'>
+          {stats.map((stat, i) => (
+            <StatCard key={i} {...stat} />
+          ))}
+        </motion.div>
 
-        <QualityAlerts /> {/* Reemplaza EnvironmentalAlerts */}
-        <OverviewCards />  {/* Ahora muestra: chips OK, en riesgo, etc. */}
+        <ProductsTable /> {/* ← Asegúrate que este componente reciba sus props correctamente */}
 
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
-          <ChipList onSelectChip={setSelectedChip} selectedChip={selectedChip} /> {/* Antes: SatelliteList */}
-          <ChipMonitoring chip={selectedChip} /> {/* Antes: SatelliteMonitoring */}
-        </div>
-
-        <ParameterTrendChart timeRange={timeRange} /> {/* Antes: EnvironmentalImpactChart */}
-
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
-          <VoltageAnalysis timeRange={timeRange} />  {/* Antes: MaterialUsage */}
-          <DefectCorrelation timeRange={timeRange} /> {/* Antes: WasteProduction */}
+        {/* Gráficos */}
+        <div className='grid grid-col-1 lg:grid-cols-2 gap-8'>
+          <ProductionTrendChart />
         </div>
       </main>
     </div>
   );
 };
 
-export default AnalyticsPage;
+export default ProductsPage;

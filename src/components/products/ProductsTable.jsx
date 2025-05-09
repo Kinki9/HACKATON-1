@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { Cpu, AlertTriangle, Activity, Search, Edit, Trash2, PlusCircle } from "lucide-react";
 import { useState } from "react";
 
+
+
 // Datos simulados de semiconductores
 const CHIP_DATA = [
   {
