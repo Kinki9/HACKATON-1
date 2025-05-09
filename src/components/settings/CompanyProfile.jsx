@@ -5,7 +5,7 @@ const CompanyProfile = () => {
     <div className="bg-gray-800 rounded-lg shadow p-6">
       <h2 className="text-xl font-semibold text-white flex items-center gap-2 mb-4">
         <BuildingOffice2Icon className="h-5 w-5" />
-        Company Profile
+        Perfil de la empresa
       </h2>
       <div className="space-y-4">
         <div>
@@ -39,13 +39,13 @@ const CompanyProfile = () => {
               <span className="text-gray-300">Logo</span>
             </div>
             <button className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
-              Upload New
+              Subir nuevo
             </button>
           </div>
         </div>
         <div className="pt-2">
           <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
-            Save Changes
+            Guardar cambios
           </button>
         </div>
       </div>

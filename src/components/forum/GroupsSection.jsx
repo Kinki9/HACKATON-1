@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-// Áreas específicas para la industria aeroespacial
+// Áreas específicas
 const areaOptions = [
   "Ingeniería Aeroespacial",
   "Control de Misión",
@@ -11,7 +11,7 @@ const areaOptions = [
   "Análisis de Datos",
   "Administración de Proyectos"
 ];
-
+ 
 const GroupsSection = ({ onNewGroup }) => {
   const [groups, setGroups] = useState(() => {
     const saved = localStorage.getItem("forumGroups");

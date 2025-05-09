@@ -55,12 +55,12 @@ const ApiIntegrations = () => {
                 </div>
                 {integration.connected ? (
                   <button className="text-sm bg-gray-600 hover:bg-gray-500 text-white px-4 py-1 rounded-md">
-                    Disconnect
+                    Desconectar
                   </button>
                 ) : (
                   <button className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded-md flex items-center gap-1">
                     <LinkIcon className="h-3 w-3" />
-                    Connect
+                    Conectar
                   </button>
                 )}
               </div>
