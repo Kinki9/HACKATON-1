@@ -1,4 +1,7 @@
 import { Route, Routes } from "react-router-dom";
+import { WagmiConfig } from "wagmi";
+import { config } from "./config/wagmiConfig"; // Importación corregida
+
 
 import Sidebar from "./components/common/Sidebar";
 
@@ -14,6 +17,8 @@ import { Menu } from "lucide-react";
 
 function App() {
 	return (
+    <WagmiConfig config={config}>
+
 		<div className='flex h-screen bg-gray-900 text-gray-100 overflow-hidden'>
 			{/* BG */}
 			<div className='fixed inset-0 z-0'>
@@ -34,6 +39,8 @@ function App() {
 
 			</Routes>
 		</div>
+
+     </WagmiConfig>
 	);
 }
 

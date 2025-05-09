@@ -1,65 +1,170 @@
 import { CubeTransparentIcon, WalletIcon, QrCodeIcon, ServerStackIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { ethers } from "ethers";
+import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react'; // Importación corregida
+import { mainnet, polygon, bsc } from 'wagmi/chains';
+import { WagmiConfig } from 'wagmi';
+
+// Opción 1: Importación directa del provider
+import { Web3Provider } from "@ethersproject/providers";
+
+// 1. Configuración de cadenas y proyecto
+const chains = [mainnet, polygon, bsc];
+const projectId = 'b763ba612fceccf95f0eb9cdcc72ade0'; // Reemplaza con tu ID real
+
+// 2. Configuración de metadatos
+const metadata = {
+  name: 'Tu Aplicación Blockchain',
+  description: 'Configuración de Blockchain',
+  url: 'https://tuapp.com',
+  icons: ['https://tuapp.com/logo.png']
+};
+
+// 3. Crear configuración Wagmi
+const wagmiConfig = defaultWagmiConfig({
+  chains,
+  projectId,
+  metadata
+});
+
+// 4. Crear modal Web3
+createWeb3Modal({
+  wagmiConfig,
+  projectId,
+  chains,
+  themeVariables: {
+    '--w3m-accent-color': '#3b82f6',
+    '--w3m-background-color': '#3b82f6'
+  }
+});
 
 const BlockchainSettings = () => {
-  const [walletAddress, setWalletAddress] = useState("0x71C7656EC7ab88b098defB751B7401B5f6d8976F");
-  const [network, setNetwork] = useState("Ethereum Mainnet");
-  const [smartContracts, setSmartContracts] = useState([
-    { id: 1, name: "PaymentProcessor", address: "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7", verified: true },
-    { id: 2, name: "TokenContract", address: "0x7be8076f4ea4a4ad08075c2508e481d6c946d12b", verified: false },
-  ]);
+  const [walletAddress, setWalletAddress] = useState("");
+  const [network, setNetwork] = useState("");
+  const [provider, setProvider] = useState(null);
+  const [smartContracts, setSmartContracts] = useState([]);
+  const [isConnected, setIsConnected] = useState(false);
 
-  const connectWallet = async () => {
-    try {
-    // 1. Verificar si MetaMask está instalado
-    if (!window.ethereum) {
-      throw new Error("Por favor instala MetaMask u otra wallet Ethereum");
+  useEffect(() => {
+    checkWalletConnection();
+  }, []);
+
+  const checkWalletConnection = async () => {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+          setupProvider();
+        }
+      } catch (error) {
+        console.error("Error checking wallet connection:", error);
+      }
     }
+  };
 
-    // 2. Crear proveedor ethers
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const setupProvider = async () => {
+    const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+    setProvider(web3Provider);
     
-    // 3. Solicitar acceso a la cuenta
-    const accounts = await provider.send("eth_requestAccounts", []);
-    
-    if (accounts.length === 0) {
-      throw new Error("No se encontraron cuentas. Por favor conecta tu wallet.");
-    }
-
-    // 4. Obtener dirección y red
-    const signer = provider.getSigner();
+    const signer = web3Provider.getSigner();
     const address = await signer.getAddress();
-    const network = await provider.getNetwork();
-
-    // 5. Actualizar estado
     setWalletAddress(address);
-    setNetwork(network.name === "homestead" ? "Ethereum Mainnet" : network.name);
     
-    // 6. Escuchar cambios de cuenta
-    window.ethereum.on("accountsChanged", (newAccounts) => {
-      setWalletAddress(newAccounts[0] || "");
+    const network = await web3Provider.getNetwork();
+    setNetwork(getNetworkName(network.chainId));
+    setIsConnected(true);
+    
+    setupEventListeners(web3Provider);
+  };
+
+  const getNetworkName = (chainId) => {
+    switch(chainId) {
+      case 1: return "Ethereum Mainnet";
+      case 137: return "Polygon Mainnet";
+      case 56: return "Binance Smart Chain";
+      case 5: return "Ethereum Goerli Testnet";
+      default: return `Unknown Network (ID: ${chainId})`;
+    }
+  };
+
+  const setupEventListeners = (web3Provider) => {
+    window.ethereum.on('accountsChanged', (accounts) => {
+      setWalletAddress(accounts[0] || "");
+      if (!accounts[0]) {
+        setIsConnected(false);
+      }
     });
 
-      // 7. Escuchar cambios de red
-    window.ethereum.on("chainChanged", () => {
+    window.ethereum.on('chainChanged', (chainId) => {
+      setNetwork(getNetworkName(parseInt(chainId, 16)));
       window.location.reload();
     });
+  };
 
-    } catch (error) {
-    console.error("Error al conectar la wallet:", error);
+ const connectWallet = async () => {
+  try {
+    // Verificar que window.ethereum existe
+    if (!window.ethereum) {
+      throw new Error("No se detectó un proveedor Ethereum");
+    }
+
+    // Crear el proveedor según la versión
+    let provider;
+    if (Web3Provider) {
+      // Para @ethersproject/providers
+      provider = new Web3Provider(window.ethereum);
+    } else if (ethers?.providers?.Web3Provider) {
+      // Para ethers v5
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+    } else if (BrowserProvider) {
+      // Para ethers v6
+      provider = new BrowserProvider(window.ethereum);
+    } else {
+      throw new Error("No se pudo inicializar el proveedor ethers");
+    }
+
+    const signer = await provider.getSigner();
+    const address = await signer.getAddress();
+    setWalletAddress(address);
+    
+    const network = await provider.getNetwork();
+    setNetwork(network.name);
+    setIsConnected(true);
+
+  } catch (error) {
+    console.error("Error en setupProvider:", error);
     alert(`Error: ${error.message}`);
   }
+};
+    
+  const detectEthereumProvider = () => {
+  // Verificar si ya está disponible
+  if (window.ethereum) {
+    return window.ethereum;
+  }
 
+  // Buscar proveedores inyectados
+  if (window.web3?.currentProvider) {
+    return window.web3.currentProvider;
+  }
+
+  // Buscar proveedores modernos
+  if (document.querySelector('web3-provider')) {
+    return document.querySelector('web3-provider');
+  }
+
+  return null;
+};
+    
+
+  const disconnectWallet = () => {
+    setWalletAddress("");
+    setNetwork("");
+    setIsConnected(false);
+    setProvider(null);
   };
 
-  const verifyContract = (contractId) => {
-    // Lógica de verificación de contrato
-    setSmartContracts(smartContracts.map(contract => 
-      contract.id === contractId ? {...contract, verified: true} : contract
-    ));
-  };
-
-  return (
+ return (
     <div className="bg-gray-800 rounded-lg shadow p-6">
       <h2 className="text-xl font-semibold text-white flex items-center gap-2 mb-4">
         <CubeTransparentIcon className="h-5 w-5" />
@@ -73,7 +178,7 @@ const BlockchainSettings = () => {
             <WalletIcon className="h-5 w-5" />
             Wallet Connection
           </h3>
-          {walletAddress ? (
+          {isConnected ? (
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <div className="bg-gray-600 p-2 rounded-full">
@@ -91,7 +196,10 @@ const BlockchainSettings = () => {
                 >
                   Copy Address
                 </button>
-                <button className="text-sm bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-md">
+                <button 
+                  className="text-sm bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-md"
+                  onClick={disconnectWallet}
+                >
                   Disconnect
                 </button>
               </div>
