@@ -1,58 +1,60 @@
-import { useState, useEffect } from 'react'; // Asegúrate de importar hooks
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Factory, Package, Truck, Clock, TrendingUp } from 'lucide-react';
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
-import ProductsTable from "../components/products/ProductsTable";
-import ProductionTrendChart from "../components/products/ProductionTrendChart";
-import { Cpu, AlertTriangle, Activity, Truck } from "lucide-react";
+import ProductionTable from "../components/products/ProductionTable";
+import ProductionTimeline from "../components/products/ProductionTimeline";
+import ShipmentTracking from "../components/products/ShipmentTracking";
 
 const ProductsPage = () => {
-  // 1. Inicializa estados con valores por defecto
-  const [stats, setStats] = useState([
-    { name: 'Chips Fabricados', value: 0, icon: Cpu, color: '#6366F1' },
-    { name: 'Tasa de Fallos', value: '0%', icon: AlertTriangle, color: '#F59E0B' },
-    { name: 'Rendimiento', value: '0%', icon: Activity, color: '#10B981' },
-    { name: 'Envíos Hoy', value: 0, icon: Truck, color: '#EF4444' }
+  const [productionStats, setProductionStats] = useState([
+    { name: 'Unidades Hoy', value: 0, icon: Factory, color: '#3B82F6' },
+    { name: 'En Producción', value: 0, icon: Clock, color: '#F59E0B' },
+    { name: 'Tasa Eficiencia', value: '0%', icon: TrendingUp, color: '#10B981' },
+    { name: 'Envíos Pendientes', value: 0, icon: Truck, color: '#EF4444' }
   ]);
 
-  // 2. Carga datos de forma segura
   useEffect(() => {
-    try {
-      // Simula carga de datos
-      setTimeout(() => {
-        setStats([
-          { name: 'Chips Fabricados', value: 1243, icon: Cpu, color: '#6366F1' },
-          { name: 'Tasa de Fallos', value: '5.2%', icon: AlertTriangle, color: '#F59E0B' },
-          { name: 'Rendimiento', value: '92.5%', icon: Activity, color: '#10B981' },
-          { name: 'Envíos Hoy', value: 42, icon: Truck, color: '#EF4444' }
-        ]);
-      }, 500);
-    } catch (error) {
-      console.error("Error loading data:", error);
-    }
+    // Simulación de carga de datos
+    setTimeout(() => {
+      setProductionStats([
+        { name: 'Unidades Hoy', value: 1243, icon: Factory, color: '#3B82F6' },
+        { name: 'En Producción', value: 856, icon: Clock, color: '#F59E0B' },
+        { name: 'Tasa Eficiencia', value: '92.5%', icon: TrendingUp, color: '#10B981' },
+        { name: 'Envíos Pendientes', value: 42, icon: Truck, color: '#EF4444' }
+      ]);
+    }, 500);
   }, []);
 
   return (
     <div className='flex-1 overflow-auto relative z-10'>
-      <Header title='Fabricación de Semiconductores' subtitle="Datos en tiempo real" />
+      <Header 
+        title="Producción en Tiempo Real" 
+        subtitle="Monitoreo de fabricación y logística" 
+      />
       
       <main className='max-w-7xl mx-auto py-6 px-4 lg:px-8'>
-        {/* Stats - con verificación */}
-        {stats && (
-          <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8'>
-            {stats.map((stat, index) => (
-              <StatCard key={index} {...stat} />
-            ))}
+        {/* Estadísticas de producción */}
+        <motion.div 
+          className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8'
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {productionStats.map((stat, index) => (
+            <StatCard key={index} {...stat} />
+          ))}
+        </motion.div>
+
+        {/* Línea de tiempo de producción */}
+        <ProductionTimeline className="mb-8" />
+
+        {/* Tabla y gráficos */}
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8'>
+          <div className='lg:col-span-2'>
+            <ProductionTable />
           </div>
-        )}
-
-        {/* Tabla con protección */}
-        <div className='mb-8'>
-          <ProductsTable />
-        </div>
-
-        {/* Gráficos */}
-        <div className='grid grid-col-1 lg:grid-cols-2 gap-8'>
-          <ProductionTrendChart />
+          <ShipmentTracking />
         </div>
       </main>
     </div>

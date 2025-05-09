@@ -2,7 +2,7 @@ import { Cpu, Clock, CheckCircle, DollarSign, Package } from "lucide-react";
 import { motion } from "framer-motion";
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
-import SemiconductorOrdersChart from "../components/orders/SemiconductorOrdersChart";
+import SemiconductorOrdersChart from "../components/orders/SemiconductorOrderChart"
 import OrderStatusDistribution from "../components/orders/OrderStatusDistribution";
 import SemiconductorOrdersTable from "../components/orders/SemiconductorOrdersTable";
 import MonthlyProductionInvestment from "../components/orders/MonthlyProductionInvestment";

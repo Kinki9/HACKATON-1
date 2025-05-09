@@ -1,38 +1,62 @@
-// ProductsPage.jsx
-import { motion } from "framer-motion";
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Cpu, Thermometer, Gauge, AlertCircle, CheckCircle } from 'lucide-react';
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
-import { Cpu, AlertTriangle, Activity, Truck } from "lucide-react";
-import ProductionTrendChart from "../components/products/ProductionTrendChart";
-import ProductsTable from "../components/products/ProductsTable";
+import QualityTrendChart from "../components/analytics/QualityTrendChart";
+import DefectAnalysis from "../components/analytics/DefectAnalysis";
+import EnvironmentalImpact from "../components/analytics/EnvironmentalImpact";
 
-const ProductsPage = () => {
-  // Datos simulados (evitar undefined)
-  const stats = [
-    { name: "Chips Fabricados", value: 1243, icon: Cpu, color: "#6366F1" },
-    // ... otros datos
-  ];
+const AnalyticsPage = () => {
+  const [qualityStats, setQualityStats] = useState([
+    { name: 'Chips Analizados', value: 0, icon: Cpu, color: '#6366F1' },
+    { name: 'Temperatura Avg', value: '0°C', icon: Thermometer, color: '#EF4444' },
+    { name: 'Rendimiento', value: '0%', icon: Gauge, color: '#10B981' },
+    { name: 'Chips Aprobados', value: 0, icon: CheckCircle, color: '#22C55E' }
+  ]);
+
+  useEffect(() => {
+    // Simulación de carga de datos
+    setTimeout(() => {
+      setQualityStats([
+        { name: 'Chips Analizados', value: 2456, icon: Cpu, color: '#6366F1' },
+        { name: 'Temperatura Avg', value: '72°C', icon: Thermometer, color: '#EF4444' },
+        { name: 'Rendimiento', value: '94.3%', icon: Gauge, color: '#10B981' },
+        { name: 'Chips Aprobados', value: 2312, icon: CheckCircle, color: '#22C55E' }
+      ]);
+    }, 500);
+  }, []);
 
   return (
     <div className='flex-1 overflow-auto relative z-10'>
-      <Header title='Fabricación de Semiconductores' />
+      <Header 
+        title="Control de Calidad" 
+        subtitle="Análisis de producción y defectos" 
+      />
+      
       <main className='max-w-7xl mx-auto py-6 px-4 lg:px-8'>
-        {/* Stats */}
-        <motion.div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8'>
-          {stats.map((stat, i) => (
-            <StatCard key={i} {...stat} />
+        {/* Estadísticas de calidad */}
+        <motion.div 
+          className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8'
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {qualityStats.map((stat, index) => (
+            <StatCard key={index} {...stat} />
           ))}
         </motion.div>
 
-        <ProductsTable /> {/* ← Asegúrate que este componente reciba sus props correctamente */}
-
-        {/* Gráficos */}
-        <div className='grid grid-col-1 lg:grid-cols-2 gap-8'>
-          <ProductionTrendChart />
+        {/* Gráficos principales */}
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
+          <QualityTrendChart />
+          <DefectAnalysis />
         </div>
+
+        {/* Impacto ambiental */}
+        <EnvironmentalImpact />
       </main>
     </div>
   );
 };
 
-export default ProductsPage;
+export default AnalyticsPage;
